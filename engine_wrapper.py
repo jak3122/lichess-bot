@@ -5,6 +5,7 @@ import chess.engine
 import chess.polyglot
 import chess.syzygy
 import chess.gaviota
+from chess.pgn import Game
 import subprocess
 import logging
 import time
@@ -183,7 +184,8 @@ class EngineWrapper:
             else:
                 time_limit = game_clock_time(board, game, start_time, move_overhead)
 
-            best_move = self.search(board, time_limit, can_ponder, draw_offered, best_move)
+            best_move = self.search(game, board, li, time_limit,
+                                    can_ponder, draw_offered, best_move)
         else:
             self.stop()
 
@@ -236,7 +238,7 @@ class EngineWrapper:
                 result.resigned = True
         return result
 
-    def search(self, board: chess.Board, time_limit: chess.engine.Limit, ponder: bool, draw_offered: bool,
+    def search(self, game: model.Game, board: chess.Board, li: lichess.Lichess, time_limit: chess.engine.Limit, ponder: bool, draw_offered: bool,
                root_moves: MOVE) -> chess.engine.PlayResult:
         """
         Tell the engine to search.
@@ -545,7 +547,7 @@ class MinimalEngine(EngineWrapper):
         """Homemade engines don't have a pid, so we return a question mark."""
         return "?"
 
-    def search(self, board: chess.Board, time_limit: chess.engine.Limit, ponder: bool, draw_offered: bool,
+    def search(self, game: Game, board: chess.Board, time_limit: chess.engine.Limit, ponder: bool, draw_offered: bool,
                root_moves: MOVE) -> chess.engine.PlayResult:
         """
         Choose a move.
